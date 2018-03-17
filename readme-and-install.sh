@@ -6,11 +6,13 @@
 # commands
 SUDO=/usr/bin/sudo
 INSTALL=/usr/bin/install
-PORT=/opt/local/bin/port
+BREW=/usr/local/bin/brew
 CPAN=/usr/bin/cpan
-GPG=/opt/local/bin/gpg
+GPG=/usr/local/bin/gpg
 CURL=/usr/bin/curl
 OPEN=/usr/bin/open
+RUBY=/usr/bin/ruby
+PIPENV=/usr/local/bin/pipenv
 DIFF=/usr/bin/diff
 PATCH=/usr/bin/patch
 LAUNCHCTL=/bin/launchctl
@@ -59,7 +61,7 @@ This install script installs and configures an macOS Firewall and Privatizing
 Proxy. It will:
 
 	* Prompt you to install Apple's Xcode Command Line Tools and
-	  Macports <https://www.macports.org/> Uses Macports to
+	  Homebrew <https://brew.sh/> Uses Homebrew to
 	* Download and install several key utilities and applications
 	  (wget gnupg p7zip squid privoxy nmap)
 	* Configure macOS's PF native firewall (man pfctl, man pf.conf),
@@ -67,10 +69,10 @@ Proxy. It will:
 	* Turn on macOS's native Apache webserver to serve the
 	  Automatic proxy configuration http://localhost/proxy.pac
 	* Networking on the local computer can be set up to use this
-          Automatic Proxy Configuration without breaking App Store or
-          other updates (see squid.conf)
+        Automatic Proxy Configuration without breaking App Store or
+        other updates (see squid.conf)
 	* Uncomment the nat directive in pf.conf if you wish to set up
-          an OpenVPN server <https://discussions.apple.com/thread/5538749>
+        an OpenVPN server <https://discussions.apple.com/thread/5538749>
 	* Install and launch daemons that download and regularly
 	  update open source IP and host blacklists. The sources are
 	  emergingthreats.net (net.emergingthreats.blockips.plist),
@@ -78,8 +80,8 @@ Proxy. It will:
 	  (net.hphosts.hosts.plist), and EasyList
 	  (com.github.essandess.easylist-pac.plist)
 	* Installs a user launch daemon that deletes flash cookies not
-          related to Adobe Flash Player settings every half-hour
-          <http://goo.gl/k4BxuH>
+        related to Adobe Flash Player settings every half-hour
+        <http://goo.gl/k4BxuH>
 	* After installation the connection between clients and the
 	  internet looks this this:
 
@@ -140,15 +142,10 @@ then
     $SUDO /usr/bin/xcodebuild -license
 fi
 
-# Install MacPorts
-if ! [ -x $PORT ]
+# Install Homebrew
+if ! [ -x $BREW ]
 then
-    $OPEN -a Safari https://www.macports.org/install.php
-    $CAT <<MACPORTS
-Please download and install Macports from https://www.macports.org/install.php
-then run this script again.
-MACPORTS
-    exit 1
+	$RUBY -e "$($CURL -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 fi
 
 # Install stack for adblock2privoxy
@@ -158,13 +155,9 @@ then
     $CURL -sSL https://get.haskellstack.org/ | $SH
 fi
 
-# Proxy settings in /opt/local/etc/macports/macports.conf
-$SUDO $PORT selfupdate
-
 # Install wget, gnupg, 7z, proxies, perl, and python modules
-$SUDO $PORT uninstall squid && $SUDO $PORT clean --dist squid
-$SUDO $PORT install wget gnupg p7zip squid3 privoxy nginx nmap python36 py36-scikit-learn py36-matplotlib py36-numpy
-$SUDO $PORT select --set python3 python36
+$BREW install pipenv wget gnupg p7zip squid3 privoxy nginx nmap python
+$PIPENV install scikit-learn matplotlib numpy
 $SUDO $CPAN install
 $SUDO $CPAN -i Data::Validate::IP
 $SUDO $CPAN -i Data::Validate::Domain
@@ -176,7 +169,7 @@ $SUDO $GPG --homedir /var/root/.gnupg --list-keys
 $CAT <<'GPGID'
 Keep your gpg keychain up to date by checking the keys IDs with these commands:
 
-/opt/local/bin/gpg --verify /usr/local/etc/block.txt.asc /usr/local/etc/block.txt
+/usr/local/bin/gpg --verify /usr/local/etc/block.txt.asc /usr/local/etc/block.txt
 /usr/bin/unzip -o /usr/local/etc/hosts.zip -d /tmp/hphosts && /opt/local/bin/gpg --verify /tmp/hphosts/hosts.txt.asc /tmp/hphosts/hosts.txt
 GPGID
 $ECHO 'To delete expited keys, see http://superuser.com/questions/594116/clean-up-my-gnupg-keyring/594220#comment730593_594220'
@@ -218,7 +211,7 @@ if ! [ -x $ADBLOCK2PRIVOXY ]
 then
     $SUDO $MKDIR -p /usr/local/etc/adblock2privoxy
     $SUDO $RSYNC -a easylist-pac-privoxy/adblock2privoxy/adblock2privoxy* /usr/local/etc/adblock2privoxy
-    # ensure that macOS /usr/bin/gcc is the C compiler    
+    # ensure that macOS /usr/bin/gcc is the C compiler
     $SUDO -E $SH -c 'export PATH=/usr/bin:$PATH ; export STACK_ROOT=/usr/local/etc/.stack ; ( cd /usr/local/etc/adblock2privoxy/adblock2privoxy ; /usr/local/bin/stack setup --allow-different-user ; /usr/local/bin/stack install --local-bin-path /usr/local/bin --allow-different-user )'
     $SUDO $INSTALL -m 644 ./easylist-pac-privoxy/adblock2privoxy/nginx.conf /usr/local/etc/adblock2privoxy
     $SUDO $INSTALL -m 644 ./easylist-pac-privoxy/adblock2privoxy/default.html /usr/local/etc/adblock2privoxy/css
@@ -307,8 +300,8 @@ $SUDO $LAUNCHCTL load -w /Library/LaunchDaemons/org.squid-cache.squid-rotate.pli
 
 $LAUNCHCTL load ~/Library/LaunchAgents/org.opensource.flashcookiedelete.plist
 
-$SUDO $PORT load squid
-$SUDO $PORT load privoxy
+$BREW services start squid
+$BREW services start privoxy
 
 
 # Turn on macOS Server's adaptive firewall:

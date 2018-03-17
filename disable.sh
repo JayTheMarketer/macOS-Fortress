@@ -7,7 +7,7 @@
 
 # commands
 SUDO=/usr/bin/sudo
-PORT=/opt/local/bin/port
+BREW=/usr/local/bin/brew
 LAUNCHCTL=/bin/launchctl
 PFCTL=/sbin/pfctl
 KILLALL=/usr/bin/killall
@@ -53,10 +53,10 @@ $SUDO $PFCTL -d
 
 $ECHO "Killing the squid and privoxy proxies…"
 
-$SUDO $PORT unload squid
+$BREW services stop squid
 $SUDO $KILLALL -9 squid
 $SUDO $KILLALL -9 '(squid-1)'
-$SUDO $PORT unload privoxy
+$BREW services stop privoxy
 
 
 $ECHO ""
