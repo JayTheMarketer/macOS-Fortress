@@ -8,11 +8,11 @@ SUDO=/usr/bin/sudo
 INSTALL=/usr/bin/install
 BREW=/usr/local/bin/brew
 CPAN=/usr/bin/cpan
-GPG=/usr/local/bin/gpg
 CURL=/usr/bin/curl
 OPEN=/usr/bin/open
 RUBY=/usr/bin/ruby
 PIPENV=/usr/local/bin/pipenv
+GPG=/usr/local/bin/gpg
 DIFF=/usr/bin/diff
 PATCH=/usr/bin/patch
 LAUNCHCTL=/bin/launchctl
@@ -42,9 +42,9 @@ as well as blocks ads, malicious scripts, and conceal information used
 to track you around the web. After this package was installed, snort
 and other detections have fallen to a fraction with a few simple
 blocking actions.  This setup is a lot more capable and effective than
-using a simple adblocking browser Add-On. There's a world of
+using a simple adblocking browser Add-On. There is a world of
 difference between ad-filled web pages with and without a filtering
-proxy server. It's also saved me from inadvertantly clicking on
+proxy server. It has also saved me from inadvertantly clicking on
 phishing links.
 
 This package uses these features:
@@ -60,13 +60,13 @@ This package uses these features:
 This install script installs and configures an macOS Firewall and Privatizing
 Proxy. It will:
 
-	* Prompt you to install Apple's Xcode Command Line Tools and
+	* Prompt you to install Xcode Command Line Tools and
 	  Homebrew <https://brew.sh/> Uses Homebrew to
 	* Download and install several key utilities and applications
 	  (wget gnupg p7zip squid privoxy nmap)
-	* Configure macOS's PF native firewall (man pfctl, man pf.conf),
+	* Configure the macOS PF native firewall (man pfctl, man pf.conf),
 	  squid, and privoxy
-	* Turn on macOS's native Apache webserver to serve the
+	* Turn on macOS native Apache webserver to serve the
 	  Automatic proxy configuration http://localhost/proxy.pac
 	* Networking on the local computer can be set up to use this
         Automatic Proxy Configuration without breaking App Store or
@@ -98,7 +98,7 @@ Notes:
 	  http://lan_ip/proxy.pac to protect devices on the LAN.
 	* Count the number of attacks since boot with the script
 	  pf_attacks. ``Attack'' is defined as the number of blocked IPs
-	  in PF's bruteforce table plus the number of denied connections
+	  in the PF bruteforce table plus the number of denied connections
 	  from blacklisted IPs in the tables compromised_ips,
 	  dshield_block_ip, and emerging_threats.
 	* Both squid and Privoxy are configured to forge the User-Agent.
@@ -117,7 +117,7 @@ Notes:
 	  individually using pf_restart, privoxy_restart, and
 	  squid_restart. And please post a solution if you find one.
 	* All open source updates are done using the 'wget -N' option
-          to save everyone's bandwidth
+          to save everyone bandwidth
 
 Security:
 
